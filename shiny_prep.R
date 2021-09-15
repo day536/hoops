@@ -22,7 +22,7 @@ four_factors_data <- curated_player_data %>%
 
 player_impact_data <- curated_player_data %>% 
   ungroup() %>% 
-  select(matches(player_profile_vec) | g, mp, contains(player_impact_vec) | contains(player_totals_vec)) %>% 
+  select(matches(player_profile_vec) | g, mp, contains(player_impact_vec)) %>% 
   select(-contains("link"))
 
 
