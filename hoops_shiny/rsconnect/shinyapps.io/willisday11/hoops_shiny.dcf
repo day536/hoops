@@ -1,0 +1,11 @@
+name: hoops_shiny
+title:
+username:
+account: willisday11
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4655570
+bundleId: 5043775
+url: https://willisday11.shinyapps.io/hoops_shiny/
+when: 1631893234.39053
+lastSyncTime: 1631893234.39053
