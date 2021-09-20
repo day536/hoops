@@ -6,9 +6,11 @@ curated_player_data <- read_csv("https://raw.githubusercontent.com/day536/hoops/
 #Curate and prep for the app
 curated_player_data <- curated_player_data %>% 
   mutate(ast_usagepercent = astpercent/usgpercent) %>% 
+  filter(fga >= 30) %>% 
   group_by(pos) %>% 
   mutate_at(vars(fg:bpm, ast_usagepercent), funs("percentile" = rank(.)/length(.))) %>% 
-  ungroup()
+  ungroup() %>% 
+  mutate(tovpercent_percentile = 1 - tovpercent_percentile)
 
 
 player_profile_vec <- c("player", "class", "season", "pos", "school")
