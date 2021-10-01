@@ -12,13 +12,23 @@ curated_player_data <- curated_player_data %>%
          fga_at_rim = round(percent_shots_at_rim * hm_fag, 0)/g,
          fga_2pt_j = round(percent_shots_2pt_j * hm_fag, 0)/g,
          fga_3pt = round(percent_of_shots_3pt * hm_fag, 0)/g) %>% 
+  mutate(across(g:fga_3pt, ~replace_na(.x, 0))) %>% 
   filter(fga >= 30) %>% 
   ##mutate_at(across(c("ts_percent","ft_percent"), map_dbl(.x = ., .f ~))
   #mutate(ts_percent = map_dbl(.x = ts_percent, .f = ~replace_na(x = .x, replace = 0))) %>% 
   group_by(pos) %>% 
   mutate_at(vars(fg:bpm, percent_shots_at_rim:ast_usagepercent), funs("percentile" = rank(.)/length(.))) %>% 
   ungroup() %>% 
-  mutate(tovpercent_percentile = 1 - tovpercent_percentile)
+  mutate(tovpercent_percentile = 1 - tovpercent_percentile,
+         percent_assisted_at_rim_percentile = 1 - percent_assisted_at_rim_percentile,
+         percent_assisted_2pt_j_percentile = 1 - percent_assisted_2pt_j_percentile,
+         percent_assisted_3s_percentile = 1 - percent_assisted_3s_percentile) %>% 
+  mutate(x3fg_percent_percentile = case_when(
+                                      fga_3pt < 0.5 ~ 0,
+                                      TRUE ~ x3fg_percent_percentile),
+         percent_assisted_3s_percentile = case_when(
+                                      fga_3pt < 0.5 ~ 0,
+                                      TRUE ~ percent_assisted_3s_percentile))
 
 
 player_profile_vec <- c("player", "class", "season", "pos", "school")
@@ -85,4 +95,23 @@ player_shooting_freq_data <- curated_player_data %>%
          #x3fg_percent,
          #x3fg_percent_percentile)
   
+player_shooting_assisted_data <- curated_player_data %>% 
+  ungroup() %>% 
+  select(matches(player_profile_vec) | g, mp, -contains("link"), -contains("hoop_math"),
+         efgpercent, efgpercent_percentile,
+         #percent_shots_at_rim,
+         #percent_shots_at_rim_percentile,
+         fga_at_rim,
+         percent_assisted_at_rim,
+         percent_assisted_at_rim_percentile,
+         #percent_shots_2pt_j,
+         #percent_shots_2pt_j_percentile,
+         fga_2pt_j,
+         percent_assisted_2pt_j,
+         percent_assisted_2pt_j_percentile,
+         #percent_of_shots_3pt,
+         #percent_of_shots_3pt_percentile,
+         fga_3pt,
+         percent_assisted_3s,
+         percent_assisted_3s_percentile)
 
