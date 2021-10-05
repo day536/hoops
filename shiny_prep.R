@@ -19,7 +19,7 @@ curated_player_data <- curated_player_data %>%
   ##mutate_at(across(c("ts_percent","ft_percent"), map_dbl(.x = ., .f ~))
   #mutate(ts_percent = map_dbl(.x = ts_percent, .f = ~replace_na(x = .x, replace = 0))) %>% 
   group_by(advanced_position_group) %>% 
-  mutate_at(vars(fg:bpm, percent_shots_at_rim:ast_usagepercent), funs("percentile" = rank(.)/length(.))) %>% 
+  mutate_at(vars(fg:bpm, percent_shots_at_rim:ft_percent, netrtg:ast_usagepercent), funs("percentile" = rank(.)/length(.))) %>% 
   ungroup() %>% 
   mutate(tovpercent_percentile = 1 - tovpercent_percentile,
          percent_assisted_at_rim_percentile = 1 - percent_assisted_at_rim_percentile,
@@ -36,7 +36,7 @@ curated_player_data <- curated_player_data %>%
 player_profile_vec <- c("player", "class", "season", "advanced_position_group", "school")
 player_impact_vec <- c("usgpercent", "tspercent", "astpercent", "ast_usagepercent", "tovpercent")
 four_factors_vec <- c("netrtg", "efgpercent", "orbpercent", "drbpercent", "blkpercent", "tovpercent")#, "fta_fga", "ortg", "drtg")
-four_factors_off_vec <- c("netrtg", "ortg", "efgpercent", "orbpercent", "tovpercent", "fta_fga")#, "fta_fga", "ortg", "drtg")
+four_factors_off_vec <- c("ortg", "efgpercent", "orbpercent", "tovpercent", "fta_fga")#, "fta_fga", "ortg", "drtg")
 
 #shooting_vec <- c("shots_at_rim", "percent_at_rim", "2pt_j", "2pt_jumper", "x3fg")
 
@@ -48,7 +48,8 @@ four_factors_data <- curated_player_data %>%
 
 four_factors_off_data <- curated_player_data %>% 
   ungroup() %>% 
-  select(matches(player_profile_vec) | g, mp, contains(four_factors_off_vec), -contains("hoop_math")) %>% 
+  select(matches(player_profile_vec) | g, mp, bpm, bpm_percentile,
+         contains(four_factors_off_vec), -contains("hoop_math")) %>% 
   select(-contains("link"))
 
 player_impact_data <- curated_player_data %>% 
