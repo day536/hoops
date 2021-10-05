@@ -3,10 +3,12 @@ library(tidyverse)
 #Get that data boi
 curated_player_data <- read_csv("https://raw.githubusercontent.com/day536/hoops/main/curated_data/advanced.csv")
 hoop_math_shooting_data <- read_csv("https://raw.githubusercontent.com/day536/hoops/main/curated_data/hoop_math_player_bridge.csv")
+advanced_positional_clustering <- read_csv("https://raw.githubusercontent.com/day536/hoops/main/curated_data/advanced_positional_clustering.csv")
 
 #Curate and prep for the app
 curated_player_data <- curated_player_data %>% 
   left_join(hoop_math_shooting_data, by = c("player", "school", "season")) %>% 
+  left_join(advanced_positional_clustering, by = "player_link") %>% 
   mutate(netrtg = ortg - drtg,
          ast_usagepercent = astpercent/usgpercent,
          fga_at_rim = round(percent_shots_at_rim * hm_fag, 0)/g,
@@ -16,7 +18,7 @@ curated_player_data <- curated_player_data %>%
   filter(fga >= 30) %>% 
   ##mutate_at(across(c("ts_percent","ft_percent"), map_dbl(.x = ., .f ~))
   #mutate(ts_percent = map_dbl(.x = ts_percent, .f = ~replace_na(x = .x, replace = 0))) %>% 
-  group_by(pos) %>% 
+  group_by(advanced_position_group) %>% 
   mutate_at(vars(fg:bpm, percent_shots_at_rim:ast_usagepercent), funs("percentile" = rank(.)/length(.))) %>% 
   ungroup() %>% 
   mutate(tovpercent_percentile = 1 - tovpercent_percentile,
@@ -31,7 +33,7 @@ curated_player_data <- curated_player_data %>%
                                       TRUE ~ percent_assisted_3s_percentile))
 
 
-player_profile_vec <- c("player", "class", "season", "pos", "school")
+player_profile_vec <- c("player", "class", "season", "advanced_position_group", "school")
 player_impact_vec <- c("usgpercent", "tspercent", "astpercent", "ast_usagepercent", "tovpercent")
 four_factors_vec <- c("netrtg", "efgpercent", "orbpercent", "drbpercent", "blkpercent", "tovpercent")#, "fta_fga", "ortg", "drtg")
 four_factors_off_vec <- c("netrtg", "ortg", "efgpercent", "orbpercent", "tovpercent", "fta_fga")#, "fta_fga", "ortg", "drtg")
