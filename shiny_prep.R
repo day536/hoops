@@ -1,5 +1,6 @@
 library(tidyverse)
 
+
 #Get that data boi
 curated_player_data <- read_csv("https://raw.githubusercontent.com/day536/hoops/main/curated_data/advanced.csv")
 hoop_math_shooting_data <- read_csv("https://raw.githubusercontent.com/day536/hoops/main/curated_data/hoop_math_player_bridge.csv")
@@ -13,13 +14,14 @@ curated_player_data <- curated_player_data %>%
          ast_usagepercent = astpercent/usgpercent,
          fga_at_rim = round(percent_shots_at_rim * hm_fag, 0)/g,
          fga_2pt_j = round(percent_shots_2pt_j * hm_fag, 0)/g,
-         fga_3pt = round(percent_of_shots_3pt * hm_fag, 0)/g) %>% 
+         fga_3pt = round(percent_of_shots_3pt * hm_fag, 0)/g,
+         tspercent = tspercent*200) %>% 
   mutate(across(g:fga_3pt, ~replace_na(.x, 0))) %>% 
   filter(fga >= 30) %>% 
   ##mutate_at(across(c("ts_percent","ft_percent"), map_dbl(.x = ., .f ~))
   #mutate(ts_percent = map_dbl(.x = ts_percent, .f = ~replace_na(x = .x, replace = 0))) %>% 
   group_by(advanced_position_group) %>% 
-  mutate_at(vars(fg:bpm, percent_shots_at_rim:ft_percent, netrtg:ast_usagepercent), funs("percentile" = rank(.)/length(.))) %>% 
+  mutate_at(vars(fg:bpm, percent_shots_at_rim:ft_percent, netrtg:fga_3pt), funs("percentile" = rank(.)/length(.))) %>% 
   ungroup() %>% 
   mutate(tovpercent_percentile = 1 - tovpercent_percentile,
          percent_assisted_at_rim_percentile = 1 - percent_assisted_at_rim_percentile,
@@ -76,7 +78,9 @@ player_shooting_acc_data <- curated_player_data %>%
          #percent_of_shots_3pt_percentile,
          fga_3pt,
          x3fg_percent,
-         x3fg_percent_percentile)
+         x3fg_percent_percentile,
+         ftpercent,
+         ftpercent_percentile)
 
 player_shooting_freq_data <- curated_player_data %>% 
   ungroup() %>% 
